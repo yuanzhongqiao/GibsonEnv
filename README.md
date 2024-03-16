@@ -1,488 +1,768 @@
-# GIBSON ENVIRONMENT for Embodied Active Agents with Real-World Perception 
-
-You shouldn't play video games all day, so shouldn't your AI! We built a virtual environment simulator, Gibson, that offers real-world experience for learning perception.  
-
-<img src=misc/ui.gif width="600">
- 
-**Summary**: Perception and being active (i.e. having a certain level of motion freedom) are closely tied. Learning active perception and sensorimotor control in the physical world is cumbersome as existing algorithms are too slow to efficiently learn in real-time and robots are fragile and costly. This has given a fruitful rise to learning in the simulation which consequently casts a question on transferring to real-world. We developed Gibson environment with the following primary characteristics:  
-
-**I.** being from the real-world and reflecting its semantic complexity through virtualizing real spaces,  
-**II.** having a baked-in mechanism for transferring to real-world (Goggles function), and  
-**III.** embodiment of the agent and making it subject to constraints of space and physics via integrating a physics engine ([Bulletphysics](http://bulletphysics.org/wordpress/)).  
-
-**Naming**: Gibson environment is named after *James J. Gibson*, the author of "Ecological Approach to Visual Perception", 1979. “We must perceive in order to move, but we must also move in order to perceive” – JJ Gibson
-
-Please see the [website](http://gibson.vision/) (http://gibsonenv.stanford.edu/) for more technical details. This repository is intended for distribution of the environment and installation/running instructions.
-
-#### Paper
-**["Gibson Env: Real-World Perception for Embodied Agents"](http://gibson.vision/)**, in **CVPR 2018 [Spotlight Oral]**.
-
-
-[![Gibson summary video](misc/vid_thumbnail_600.png)](https://youtu.be/KdxuZjemyjc "Click to watch the video summarizing Gibson environment!")
-
-
-
-Release
-=================
-**This is the 0.3.1 release. Bug reports, suggestions for improvement, as well as community developments are encouraged and appreciated.** [change log file](misc/CHANGELOG.md).  
-
-
-Database
-=================
-The full database includes 572 spaces and 1440 floors and can be downloaded [here](gibson/data/README.md). A diverse set of visualizations of all spaces in Gibson can be seen [here](http://gibsonenv.stanford.edu/database/). To make the core assets download package lighter for the users, we  include a small subset (39) of the spaces. Users can download the rest of the spaces and add them to the assets folder. We also integrated [Stanford 2D3DS](http://3dsemantics.stanford.edu/) and [Matterport 3D](https://niessner.github.io/Matterport/) as separate datasets if one wishes to use Gibson's simulator with those datasets (access [here](gibson/data/README.md)).
-
-Table of contents
-=================
-
-   * [Installation](#installation)
-        * [Quick Installation (docker)](#a-quick-installation-docker)
-        * [Building from source](#b-building-from-source)
-        * [Uninstalling](#uninstalling)
-   * [Quick Start](#quick-start)
-        * [Gibson FPS](#gibson-framerate)
-        * [Web User Interface](#web-user-interface)
-        * [Rendering Semantics](#rendering-semantics)
-        * [Robotic Agents](#robotic-agents)
-        * [ROS Configuration](#ros-configuration)
-   * [Coding your RL agent](#coding-your-rl-agent)
-   * [Environment Configuration](#environment-configuration)
-   * [Goggles: transferring the agent to real-world](#goggles-transferring-the-agent-to-real-world)
-   * [Citation](#citation)
-
-
-
-Installation
-=================
-
-#### Installation Method
-
-There are two ways to install gibson, A. using our docker image (recommended) and B. building from source. 
-
-#### System requirements
-
-The minimum system requirements are the following:
-
-For docker installation (A): 
-- Ubuntu 16.04
-- Nvidia GPU with VRAM > 6.0GB
-- Nvidia driver >= 384
-- CUDA >= 9.0, CuDNN >= v7
-
-For building from the source(B):
-- Ubuntu >= 14.04
-- Nvidia GPU with VRAM > 6.0GB
-- Nvidia driver >= 375
-- CUDA >= 8.0, CuDNN >= v5
-
-#### Download data
-
-First, our environment core assets data are available [here](https://storage.googleapis.com/gibson_scenes/assets_core_v2.tar.gz). You can follow the installation guide below to download and set up them properly. `gibson/assets` folder stores necessary data (agent models, environments, etc) to run gibson environment. Users can add more environments files into `gibson/assets/dataset` to run gibson on more environments. Visit the [database readme](gibson/data/README.md) for downloading more spaces. Please sign the [license agreement](gibson/data/README.md#download) before using Gibson's database.
-
-
-A. Quick installation (docker)
------
-
-We use docker to distribute our software, you need to install [docker](https://docs.docker.com/engine/installation/) and [nvidia-docker2.0](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) first. 
-
-Run `docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi` to verify your installation. 
-
-You can either 1. pull from our docker image (recommended) or 2. build your own docker image.
-
-
-1. Pull from our docker image (recommended)
-
-```bash
-# download the dataset from https://storage.googleapis.com/gibson_scenes/dataset.tar.gz
+<div class="Box-sc-g0xbh4-0 bJMeLZ js-snippet-clipboard-copy-unpositioned" data-hpc="true"><article class="markdown-body entry-content container-lg" itemprop="text"><div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用于具有现实世界感知的具体主动代理的 GIBSON ENVIRONMENT</font></font></h1><a id="user-content-gibson-environment-for-embodied-active-agents-with-real-world-perception" class="anchor" aria-label="永久链接：具有现实世界感知的具体主动代理的吉布森环境" href="#gibson-environment-for-embodied-active-agents-with-real-world-perception"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">你不应该整天玩电子游戏，你的人工智能也不应该！</font><font style="vertical-align: inherit;">我们构建了一个虚拟环境模拟器 Gibson，它为学习感知提供了真实世界的体验。</font></font></p>
+<p dir="auto"><animated-image data-catalyst="" style="width: 600px;"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/ui.gif" data-target="animated-image.originalLink"><img src="/StanfordVL/GibsonEnv/raw/master/misc/ui.gif" style="max-width: 100%; display: inline-block;" data-target="animated-image.originalImage"></a>
+      <span class="AnimatedImagePlayer" data-target="animated-image.player" hidden="">
+        <a data-target="animated-image.replacedLink" class="AnimatedImagePlayer-images" href="https://github.com/StanfordVL/GibsonEnv/blob/master/misc/ui.gif" target="_blank">
+          
+        <span data-target="animated-image.imageContainer">
+            <img data-target="animated-image.replacedImage" alt="ui.gif" class="AnimatedImagePlayer-animatedImage" src="https://github.com/StanfordVL/GibsonEnv/raw/master/misc/ui.gif" style="display: block; opacity: 1;">
+          <canvas class="AnimatedImagePlayer-stillImage" aria-hidden="true" width="600" height="338"></canvas></span></a>
+        <button data-target="animated-image.imageButton" class="AnimatedImagePlayer-images" tabindex="-1" aria-label="Play ui.gif" hidden=""></button>
+        <span class="AnimatedImagePlayer-controls" data-target="animated-image.controls" hidden="">
+          <button data-target="animated-image.playButton" class="AnimatedImagePlayer-button" aria-label="Play ui.gif">
+            <svg aria-hidden="true" focusable="false" class="octicon icon-play" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 13.5427V2.45734C4 1.82607 4.69692 1.4435 5.2295 1.78241L13.9394 7.32507C14.4334 7.63943 14.4334 8.36057 13.9394 8.67493L5.2295 14.2176C4.69692 14.5565 4 14.1739 4 13.5427Z">
+            </path></svg>
+            <svg aria-hidden="true" focusable="false" class="octicon icon-pause" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="2" width="3" height="12" rx="1"></rect>
+              <rect x="9" y="2" width="3" height="12" rx="1"></rect>
+            </svg>
+          </button>
+          <a data-target="animated-image.openButton" aria-label="在新窗口中打开" class="AnimatedImagePlayer-button" href="https://github.com/StanfordVL/GibsonEnv/blob/master/misc/ui.gif" target="_blank">
+            <svg aria-hidden="true" class="octicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+              <path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path>
+            </svg>
+          </a>
+        </span>
+      </span></animated-image></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">摘要</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">： 感知和活跃（即具有一定程度的运动自由度）密切相关。</font><font style="vertical-align: inherit;">在物理世界中学习主动感知和感觉运动控制非常麻烦，因为现有算法太慢，无法有效地实时学习，而且机器人脆弱且成本高昂。</font><font style="vertical-align: inherit;">这使得模拟学习取得了丰硕的成果，从而提出了如何转移到现实世界的问题。</font><font style="vertical-align: inherit;">我们开发的 Gibson 环境具有以下主要特征：</font></font></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一、</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来自现实世界，通过虚拟现实空间反映其语义复杂性，</font></font><br>
+<strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">二．</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">具有转移到现实世界的内置机制（护目镜功能），以及</font></font><br>
+<strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">III。</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">代理的体现，并通过集成物理引擎（</font></font><a href="http://bulletphysics.org/wordpress/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Bulletphysicals</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）使其受到空间和物理的约束。</font></font></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">命名：吉布森环境以</font></font></strong><font style="vertical-align: inherit;"></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">James J. Gibson</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">命名</font><font style="vertical-align: inherit;">，他是《视觉感知的生态方法》一书的作者，1979 年。“我们必须感知才能移动，但我们也必须移动才能感知” – JJ Gibson</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请访问</font></font><a href="http://gibson.vision/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网站</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">( </font></font><a href="http://gibsonenv.stanford.edu/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">http://gibsonenv.stanford.edu/</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> ) 了解更多技术细节。</font><font style="vertical-align: inherit;">该存储库旨在用于分发环境和安装/运行说明。</font></font></p>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">纸</font></font></h4><a id="user-content-paper" class="anchor" aria-label="永久链接：纸" href="#paper"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><strong><a href="http://gibson.vision/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">“Gibson Env：体现代理的真实世界感知”</font></font></a></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> CVPR 2018 [Spotlight Oral]</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><a href="https://youtu.be/KdxuZjemyjc" title="点击观看总结 Gibson 环境的视频！" rel="nofollow"><img src="/StanfordVL/GibsonEnv/raw/master/misc/vid_thumbnail_600.png" alt="吉布森摘要视频" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">发布</font></font></h1><a id="user-content-release" class="anchor" aria-label="永久链接：发布" href="#release"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这是 0.3.1 版本。</font><font style="vertical-align: inherit;">我们鼓励并赞赏错误报告、改进建议以及社区发展。</font></font></strong> <a href="/StanfordVL/GibsonEnv/blob/master/misc/CHANGELOG.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更改日志文件</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">数据库</font></font></h1><a id="user-content-database" class="anchor" aria-label="永久链接：数据库" href="#database"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">完整的数据库包括 572 个空间和 1440 个楼层，可以</font></font><a href="/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在此处</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下载。</font></font><a href="http://gibsonenv.stanford.edu/database/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在这里</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可以看到吉布森所有空间的多样化可视化</font><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">为了使核心资产下载包对用户来说更轻松，我们包含了一小部分空间 (39)。</font><font style="vertical-align: inherit;">用户可以下载其余空间并将其添加到资产文件夹中。</font><font style="vertical-align: inherit;">如果您希望将 Gibson 的模拟器与这些数据集一起使用，</font><font style="vertical-align: inherit;">我们还将</font></font><a href="http://3dsemantics.stanford.edu/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">斯坦福 2D3DS</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><a href="https://niessner.github.io/Matterport/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Matterport 3D集成为单独的数据集（</font></font></a><font style="vertical-align: inherit;"></font><a href="/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在此处</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">访问）。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">目录</font></font></h1><a id="user-content-table-of-contents" class="anchor" aria-label="永久链接：目录" href="#table-of-contents"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><a href="#installation"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装</font></font></a>
+<ul dir="auto">
+<li><a href="#a-quick-installation-docker"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">快速安装（docker）</font></font></a></li>
+<li><a href="#b-building-from-source"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从源头构建</font></font></a></li>
+<li><a href="#uninstalling"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">卸载</font></font></a></li>
+</ul>
+</li>
+<li><a href="#quick-start"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">快速开始</font></font></a>
+<ul dir="auto">
+<li><a href="#gibson-framerate"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">吉布森第一人称射击游戏</font></font></a></li>
+<li><a href="#web-user-interface"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网页用户界面</font></font></a></li>
+<li><a href="#rendering-semantics"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">渲染语义</font></font></a></li>
+<li><a href="#robotic-agents"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人代理</font></font></a></li>
+<li><a href="#ros-configuration"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS配置</font></font></a></li>
+</ul>
+</li>
+<li><a href="#coding-your-rl-agent"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">编写 RL 代理的代码</font></font></a></li>
+<li><a href="#environment-configuration"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">环境配置</font></font></a></li>
+<li><a href="#goggles-transferring-the-agent-to-real-world"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">护目镜：将代理转移到现实世界</font></font></a></li>
+<li><a href="#citation"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">引文</font></font></a></li>
+</ul>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装</font></font></h1><a id="user-content-installation" class="anchor" aria-label="永久链接：安装" href="#installation"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装方法</font></font></h4><a id="user-content-installation-method" class="anchor" aria-label="永久链接：安装方法" href="#installation-method"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装 gibson 有两种方法，A. 使用我们的 docker 镜像（推荐）和 B. 从源代码构建。</font></font></p>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">系统要求</font></font></h4><a id="user-content-system-requirements" class="anchor" aria-label="永久链接：系统要求" href="#system-requirements"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">最低系统要求如下：</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">对于 docker 安装（A）：</font></font></p>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">乌班图16.04</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Nvidia GPU，显存 &gt; 6.0GB</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Nvidia 驱动程序 &gt;= 384</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">CUDA &gt;= 9.0，CuDNN &gt;= v7</font></font></li>
+</ul>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">对于从源头构建（B）：</font></font></p>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">乌班图 &gt;= 14.04</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Nvidia GPU，显存 &gt; 6.0GB</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Nvidia 驱动程序 &gt;= 375</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">CUDA &gt;= 8.0，CuDNN &gt;= v5</font></font></li>
+</ul>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下载数据</font></font></h4><a id="user-content-download-data" class="anchor" aria-label="永久链接：下载数据" href="#download-data"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">首先，我们的环境核心资产数据可以</font></font><a href="https://storage.googleapis.com/gibson_scenes/assets_core_v2.tar.gz" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在这里</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取。</font><font style="vertical-align: inherit;">您可以按照下面的安装指南正确下载并设置它们。</font></font><code>gibson/assets</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">文件夹存储运行gibson环境所需的数据（代理模型、环境等）。</font><font style="vertical-align: inherit;">用户可以添加更多环境文件以</font></font><code>gibson/assets/dataset</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在更多环境中运行gibson。</font><font style="vertical-align: inherit;">访问</font></font><a href="/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">数据库自述文件</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以下载更多空间。</font><font style="vertical-align: inherit;">使用Gibson的数据库之前</font><font style="vertical-align: inherit;">请签署</font></font><a href="/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md#download"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">许可协议。</font></font></a><font style="vertical-align: inherit;"></font></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">A.快速安装（docker）</font></font></h2><a id="user-content-a-quick-installation-docker" class="anchor" aria-label="永久链接：A.快速安装（docker）" href="#a-quick-installation-docker"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">我们使用docker来分发我们的软件，您需要先安装</font></font><a href="https://docs.docker.com/engine/installation/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">docker</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><a href="https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">nvidia-docker2.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">运行</font></font><code>docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以验证您的安装。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您可以 1. 从我们的 docker 映像中提取（推荐）或 2. 构建您自己的 docker 映像。</font></font></p>
+<ol dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从我们的 docker 镜像中提取（推荐）</font></font></li>
+</ol>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-c"><span class="pl-c">#</span> download the dataset from https://storage.googleapis.com/gibson_scenes/dataset.tar.gz</span>
 docker pull xf1280/gibson:0.3.1
 xhost +local:root
-docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v <host path to dataset folder>:/root/mount/gibson/gibson/assets/dataset xf1280/gibson:0.3.1
-```
-
-2. Build your own docker image 
-```bash
-git clone https://github.com/StanfordVL/GibsonEnv.git
+docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v <span class="pl-k">&lt;</span>host path to dataset folder<span class="pl-k">&gt;</span>:/root/mount/gibson/gibson/assets/dataset xf1280/gibson:0.3.1</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="# download the dataset from https://storage.googleapis.com/gibson_scenes/dataset.tar.gz
+docker pull xf1280/gibson:0.3.1
+xhost +local:root
+docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v <host path to dataset folder>:/root/mount/gibson/gibson/assets/dataset xf1280/gibson:0.3.1" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<ol start="2" dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">构建您自己的 docker 镜像</font></font></li>
+</ol>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>git clone https://github.com/StanfordVL/GibsonEnv.git
+<span class="pl-c1">cd</span> GibsonEnv
+./download.sh <span class="pl-c"><span class="pl-c">#</span> this script downloads assets data file and decompress it into gibson/assets folder</span>
+docker build <span class="pl-c1">.</span> -t gibson <span class="pl-c"><span class="pl-c">#</span>## finish building inside docker, note by default, dataset will not be included in the docker images</span>
+xhost +local:root <span class="pl-c"><span class="pl-c">#</span># enable display from docker</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="git clone https://github.com/StanfordVL/GibsonEnv.git
 cd GibsonEnv
 ./download.sh # this script downloads assets data file and decompress it into gibson/assets folder
 docker build . -t gibson ### finish building inside docker, note by default, dataset will not be included in the docker images
-xhost +local:root ## enable display from docker
-```
-If the installation is successful, you should be able to run `docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v <host path to dataset folder>:/root/mount/gibson/gibson/assets/dataset gibson` to create a container. Note that we don't include
-dataset files in docker image to keep our image slim, so you will need to mount it to the container when you start a container. 
-
-#### Notes on deployment on a headless server
-
-Gibson Env supports deployment on a headless server and remote access with `x11vnc`. 
-You can build your own docker image with the docker file `Dockerfile` as above.
-Instructions to run gibson on a headless server (requires X server running):
-
-1. Install nvidia-docker2 dependencies following the starter guide. Install `x11vnc` with `sudo apt-get install x11vnc`.
-2. Have xserver running on your host machine, and run `x11vnc` on DISPLAY :0.
-3. `docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0 -v <host path to dataset folder>:/root/mount/gibson/gibson/assets/dataset <gibson image name>`
-4. Run gibson with `python <gibson example or training>` inside docker.
-5. Visit your `host:5900` and you should be able to see the GUI.
-
-If you don't have X server running, you can still run gibson, see [this guide](https://github.com/StanfordVL/GibsonEnv/wiki/Running-GibsonEnv-on-headless-server) for more details.
-
-B. Building from source
------
-If you don't want to use our docker image, you can also install gibson locally. This will require some dependencies to be installed. 
-
-First, make sure you have Nvidia driver and CUDA installed. If you install from source, CUDA 9 is not necessary, as that is for nvidia-docker 2.0. Then, let's install some dependencies:
-
-```bash
-apt-get update 
+xhost +local:root ## enable display from docker" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果安装成功，您应该能够运行</font></font><code>docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v &lt;host path to dataset folder&gt;:/root/mount/gibson/gibson/assets/dataset gibson</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">来创建容器。</font><font style="vertical-align: inherit;">请注意，我们不会在 docker 镜像中包含数据集文件以保持镜像精简，因此您需要在启动容器时将其安装到容器中。</font></font></p>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在无头服务器上部署的注意事项</font></font></h4><a id="user-content-notes-on-deployment-on-a-headless-server" class="anchor" aria-label="永久链接：有关在无头服务器上部署的注意事项" href="#notes-on-deployment-on-a-headless-server"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson Env 支持在无头服务器上部署以及使用</font></font><code>x11vnc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. </font><font style="vertical-align: inherit;">您可以使用上面的 docker 文件构建自己的 docker 镜像</font></font><code>Dockerfile</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">在无头服务器上运行 gibson 的说明（需要运行 X 服务器）：</font></font></p>
+<ol dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">按照入门指南安装 nvidia-docker2 依赖项。</font><font style="vertical-align: inherit;">安装</font></font><code>x11vnc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">与</font></font><code>sudo apt-get install x11vnc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">让 xserver 在您的主机上运行，&ZeroWidthSpace;&ZeroWidthSpace;并</font></font><code>x11vnc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在 DISPLAY :0 上运行。</font></font></li>
+<li><code>docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix/X0:/tmp/.X11-unix/X0 -v &lt;host path to dataset folder&gt;:/root/mount/gibson/gibson/assets/dataset &lt;gibson image name&gt;</code></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用</font></font><code>python &lt;gibson example or training&gt;</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">内部 docker 运行 gibson。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">访问您的</font></font><code>host:5900</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，您应该能够看到 GUI。</font></font></li>
+</ol>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您没有运行 X 服务器，您仍然可以运行 gibson，请参阅</font></font><a href="https://github.com/StanfordVL/GibsonEnv/wiki/Running-GibsonEnv-on-headless-server"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">本指南</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">了解更多详细信息。</font></font></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">B. 从源头构建</font></font></h2><a id="user-content-b-building-from-source" class="anchor" aria-label="永久链接：B. 从源代码构建" href="#b-building-from-source"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果你不想使用我们的docker镜像，你也可以在本地安装gibson。</font><font style="vertical-align: inherit;">这将需要安装一些依赖项。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">首先，确保您安装了 Nvidia 驱动程序和 CUDA。</font><font style="vertical-align: inherit;">如果从源代码安装，则不需要 CUDA 9，因为它适用于 nvidia-docker 2.0。</font><font style="vertical-align: inherit;">然后，让我们安装一些依赖项：</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>apt-get update 
 apt-get install libglew-dev libglm-dev libassimp-dev xorg-dev libglu1-mesa-dev libboost-dev \
 		mesa-common-dev freeglut3-dev libopenmpi-dev cmake golang libjpeg-turbo8-dev wmctrl \
-		xdotool libzmq3-dev zlib1g-dev
-```	
-
-Install required deep learning libraries: Using python3.5 is recommended. You can create a python3.5 environment first. 
-
-```bash
-conda create -n py35 python=3.5 anaconda 
+		xdotool libzmq3-dev zlib1g-dev</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="apt-get update 
+apt-get install libglew-dev libglm-dev libassimp-dev xorg-dev libglu1-mesa-dev libboost-dev \
+		mesa-common-dev freeglut3-dev libopenmpi-dev cmake golang libjpeg-turbo8-dev wmctrl \
+		xdotool libzmq3-dev zlib1g-dev" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装所需的深度学习库：推荐使用python3.5。</font><font style="vertical-align: inherit;">可以先创建一个python3.5环境。</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>conda create -n py35 python=3.5 anaconda 
+<span class="pl-c1">source</span> activate py35 <span class="pl-c"><span class="pl-c">#</span> the rest of the steps needs to be performed in the conda environment</span>
+conda install -c conda-forge opencv
+pip install http://download.pytorch.org/whl/cu90/torch-0.3.1-cp35-cp35m-linux_x86_64.whl 
+pip install torchvision==0.2.0
+pip install tensorflow==1.3</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="conda create -n py35 python=3.5 anaconda 
 source activate py35 # the rest of the steps needs to be performed in the conda environment
 conda install -c conda-forge opencv
 pip install http://download.pytorch.org/whl/cu90/torch-0.3.1-cp35-cp35m-linux_x86_64.whl 
 pip install torchvision==0.2.0
-pip install tensorflow==1.3
-```
-Clone the repository, download data and build
-```bash
-git clone https://github.com/StanfordVL/GibsonEnv.git
+pip install tensorflow==1.3" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">克隆存储库、下载数据并构建</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>git clone https://github.com/StanfordVL/GibsonEnv.git
+<span class="pl-c1">cd</span> GibsonEnv
+./download.sh <span class="pl-c"><span class="pl-c">#</span> this script downloads assets data file and decompress it into gibson/assets folder</span>
+./build.sh build_local <span class="pl-c"><span class="pl-c">#</span>## build C++ and CUDA files</span>
+pip install -e <span class="pl-c1">.</span> <span class="pl-c"><span class="pl-c">#</span>## Install python libraries</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="git clone https://github.com/StanfordVL/GibsonEnv.git
 cd GibsonEnv
 ./download.sh # this script downloads assets data file and decompress it into gibson/assets folder
 ./build.sh build_local ### build C++ and CUDA files
-pip install -e . ### Install python libraries
-```
-
-Install OpenAI baselines if you need to run the training demo.
-
-```bash
-git clone https://github.com/fxia22/baselines.git
-pip install -e baselines
-```
-
-Uninstalling
-----
-
-Uninstall gibson is easy. If you installed with docker, just run `docker images -a | grep "gibson" | awk '{print $3}' | xargs docker rmi` to clean up the image. If you installed from source, uninstall with `pip uninstall gibson`
-
-
-Quick Start
-=================
-
-First run `xhost +local:root` on your host machine to enable display. You may need to run `export DISPLAY=:0` first. After getting into the docker container with `docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v <host path to dataset folder>:/root/mount/gibson/gibson/assets/dataset gibson`, you will get an interactive shell. Now you can run a few demos. 
-
-If you installed from source, you can run those directly using the following commands without using docker. 
-
-
-```bash
-python examples/demo/play_husky_nonviz.py ### Use ASWD keys on your keyboard to control a car to navigate around Gates building
-```
-
-<img src=misc/husky_nonviz.png width="600">
-
-You will be able to use ASWD keys on your keyboard to control a car to navigate around Gates building. A camera output will not be shown in this particular demo. 
-
-```bash
-python examples/demo/play_husky_camera.py ### Use ASWD keys on your keyboard to control a car to navigate around Gates building, while RGB and depth camera outputs are also shown.
-```
-<img src=misc/husky_camera.png width="600">
-
-You will able to use ASWD keys on your keyboard to control a car to navigate around Gates building. You will also be able to see the RGB and depth camera outputs. 
-
-```bash
-python examples/train/train_husky_navigate_ppo2.py ### Use PPO2 to train a car to navigate down the hallway in Gates building, using visual input from the camera.
-```
-
-<img src=misc/husky_train.png width="800">
-By running this command you will start training a husky robot to navigate in Gates building and go down the corridor with RGBD input. You will see some RL related statistics in the terminal after each episode.
-
-
-```bash
-python examples/train/train_ant_navigate_ppo1.py ### Use PPO1 to train an ant to navigate down the hallway in Gates building, using visual input from the camera.
-```
-
-<img src=misc/ant_train.png width="800">
-By running this command you will start training an ant to navigate in Gates building and go down the corridor with RGBD input. You will see some RL related statistics in the terminal after each episode.
-
-
-
-Gibson Framerate
-----
-Below is Gibson Environment's framerate benchmarked on different platforms. Please refer to [fps branch](https://github.com/StanfordVL/GibsonEnv/tree/fps) for the code to reproduce the results.
-<table class="table">
-  <tr>
-    <th scope="row">Platform</th>
-    <td colspan="3">Tested on Intel E5-2697 v4 + NVIDIA Tesla V100</td>
+pip install -e . ### Install python libraries" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您需要运行训练演示，请安装 OpenAI 基线。</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>git clone https://github.com/fxia22/baselines.git
+pip install -e baselines</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="git clone https://github.com/fxia22/baselines.git
+pip install -e baselines" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">卸载</font></font></h2><a id="user-content-uninstalling" class="anchor" aria-label="永久链接：卸载" href="#uninstalling"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">卸载 gibson 很简单。</font><font style="vertical-align: inherit;">如果你使用docker安装，只需运行</font></font><code>docker images -a | grep "gibson" | awk '{print $3}' | xargs docker rmi</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">清理镜像即可。</font><font style="vertical-align: inherit;">如果您从源安装，请使用卸载</font></font><code>pip uninstall gibson</code></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">快速开始</font></font></h1><a id="user-content-quick-start" class="anchor" aria-label="永久链接：快速入门" href="#quick-start"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"></font><code>xhost +local:root</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">首先在您的主机上</font><font style="vertical-align: inherit;">运行以启用显示。</font><font style="vertical-align: inherit;">您可能需要</font></font><code>export DISPLAY=:0</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">先跑步。</font><font style="vertical-align: inherit;">使用 进入 docker 容器后</font></font><code>docker run --runtime=nvidia -ti --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v &lt;host path to dataset folder&gt;:/root/mount/gibson/gibson/assets/dataset gibson</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，您将获得一个交互式 shell。</font><font style="vertical-align: inherit;">现在您可以运行一些演示。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您是从源代码安装的，则可以使用以下命令直接运行它们，而无需使用 docker。</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>python examples/demo/play_husky_nonviz.py <span class="pl-c"><span class="pl-c">#</span>## Use ASWD keys on your keyboard to control a car to navigate around Gates building</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="python examples/demo/play_husky_nonviz.py ### Use ASWD keys on your keyboard to control a car to navigate around Gates building" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/husky_nonviz.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/husky_nonviz.png" width="600" style="max-width: 100%;"></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您将能够使用键盘上的 ASWD 键来控制汽车在盖茨大楼周围导航。</font><font style="vertical-align: inherit;">此特定演示中不会显示相机输出。</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>python examples/demo/play_husky_camera.py <span class="pl-c"><span class="pl-c">#</span>## Use ASWD keys on your keyboard to control a car to navigate around Gates building, while RGB and depth camera outputs are also shown.</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="python examples/demo/play_husky_camera.py ### Use ASWD keys on your keyboard to control a car to navigate around Gates building, while RGB and depth camera outputs are also shown." tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/husky_camera.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/husky_camera.png" width="600" style="max-width: 100%;"></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您将能够使用键盘上的 ASWD 键来控制汽车在盖茨大楼周围导航。</font><font style="vertical-align: inherit;">您还可以看到 RGB 和深度相机输出。</font></font></p>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>python examples/train/train_husky_navigate_ppo2.py <span class="pl-c"><span class="pl-c">#</span>## Use PPO2 to train a car to navigate down the hallway in Gates building, using visual input from the camera.</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="python examples/train/train_husky_navigate_ppo2.py ### Use PPO2 to train a car to navigate down the hallway in Gates building, using visual input from the camera." tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/husky_train.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/husky_train.png" width="800" style="max-width: 100%;"></a></p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+通过运行此命令，您将开始训练哈士奇机器人在盖茨大楼中导航并使用 RGBD 输入沿着走廊行走。</font><font style="vertical-align: inherit;">每集结束后，您将在终端中看到一些 RL 相关的统计数据。
+</font></font><div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto"><pre>python examples/train/train_ant_navigate_ppo1.py <span class="pl-c"><span class="pl-c">#</span>## Use PPO1 to train an ant to navigate down the hallway in Gates building, using visual input from the camera.</span></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="python examples/train/train_ant_navigate_ppo1.py ### Use PPO1 to train an ant to navigate down the hallway in Gates building, using visual input from the camera." tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/ant_train.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/ant_train.png" width="800" style="max-width: 100%;"></a></p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+通过运行此命令，您将开始训练蚂蚁在盖茨大楼中导航并使用 RGBD 输入沿着走廊行走。</font><font style="vertical-align: inherit;">每集结束后，您将在终端中看到一些 RL 相关的统计数据。
+</font></font><div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">吉布森帧率</font></font></h2><a id="user-content-gibson-framerate" class="anchor" aria-label="永久链接：吉布森帧率" href="#gibson-framerate"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以下是 Gibson Environment 在不同平台上的帧率基准。</font><font style="vertical-align: inherit;">请参阅</font></font><a href="https://github.com/StanfordVL/GibsonEnv/tree/fps"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">fps 分支</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以获取重现结果的代码。</font></font></p>
+<table>
+  <tbody><tr>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">平台</font></font></th>
+    <td colspan="3"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在 Intel E5-2697 v4 + NVIDIA Tesla V100 上测试</font></font></td>
   </tr>
   <tr>
-    <th scope="col">Resolution [nxn]</th>
-    <th scope="col">128</th>
-    <th scope="col">256</th>
-    <th scope="col">512</th>
+    <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">分辨率 [nxn]</font></font></th>
+    <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">128</font></font></th>
+    <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">256</font></font></th>
+    <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">第512章</font></font></th>
  </tr>
   <tr>
-    <th scope="row">RGBD, pre network<code>f</code></th>
-    <td>109.1</td>
-    <td>58.5</td>
-    <td>26.5</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">RGBD，预网络</font></font><code>f</code></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">109.1</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">58.5</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">26.5</font></font></td>
   </tr>
   <tr>
-    <th scope="row">RGBD, post network<code>f</code></th>
-    <td>77.7</td>
-    <td>30.6</td>
-    <td>14.5</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">RGBD、后网络</font></font><code>f</code></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">77.7</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">30.6</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">14.5</font></font></td>
   </tr>
   <tr>
-    <th scope="row">RGBD, post small network<code>f</code></th>
-    <td>87.4</td>
-    <td>40.5</td>
-    <td>21.2</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">RGBD，后小网络</font></font><code>f</code></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">87.4</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">40.5</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">21.2</font></font></td>
   </tr>
   <tr>
-    <th scope="row">Depth only</th>
-    <td>253.0</td>
-    <td>197.9</td>
-    <td>124.7</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">仅深度</font></font></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">253.0</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">197.9</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">124.7</font></font></td>
   </tr>
   <tr>
-    <th scope="row">Surface Normal only</th>
-    <td>207.7</td>
-    <td>129.7</td>
-    <td>57.2</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">仅表面法线</font></font></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">207.7</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">129.7</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">57.2</font></font></td>
   </tr>
   <tr>
-    <th scope="row">Semantic only</th>
-    <td>190.0</td>
-    <td>144.2</td>
-    <td>55.6</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">仅语义</font></font></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">190.0</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">144.2</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">55.6</font></font></td>
   </tr>
   <tr>
-    <th scope="row">Non-Visual Sensory</th>
-    <td>396.1</td>
-    <td>396.1</td>
-    <td>396.1</td>
+    <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">非视觉感官</font></font></th>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">396.1</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">396.1</font></font></td>
+    <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">396.1</font></font></td>
   </tr>
+</tbody></table>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">我们还在</font></font><code>Intel I7 7700 + NVIDIA GeForce GTX 1070Ti</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><code>Tested on Intel I7 6580k + NVIDIA GTX 1080Ti</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">平台上进行了测试。</font><font style="vertical-align: inherit;">每个任务的 FPS 差异在 10% 以内。</font></font></p>
+<table>
+    <tbody><tr>
+        <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">平台</font></font></th>
+        <td colspan="6"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在 Intel E5-2697 v4 + NVIDIA Tesla V100 上测试多进程 FPS</font></font></td>
+    </tr>
+    <tr>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">配置</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">512x512 剧集同步</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">512x512 帧同步</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">256x256 剧集同步</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">256x256 帧同步</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">128x128 剧集同步</font></font></th>
+      <th scope="col"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">128x128 帧同步</font></font></th>
+    </tr>
+    <tr>
+      <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">1 进程</font></font></th>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">12.8</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">12.02</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">32.98</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">32.98</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">52</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">52</font></font></td>
+    </tr>
+    <tr>
+      <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">2个过程</font></font></th>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">23.4</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">20.9</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">60.89</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">53.63</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">86.1</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">101.8</font></font></td>
+    </tr>
+    <tr>
+      <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">4道工序</font></font></th>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">42.4</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">31.97</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">105.26</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">76.23</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">97.6</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">145.9</font></font></td>
+    </tr>
+    <tr>
+      <th scope="row"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">8道工序</font></font></th>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">72.5</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">48.1</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">138.5</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">97.72</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">113</font></font></td>
+      <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">151</font></font></td>
+    </tr>
+</tbody></table>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/mpi_fps.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/mpi_fps.png" width="600" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">网页用户界面</font></font></h2><a id="user-content-web-user-interface" class="anchor" aria-label="永久链接：网络用户界面" href="#web-user-interface"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">运行 Gibson 时，您可以使用 启动 Web 用户界面</font></font><code>python gibson/utils/web_ui.py python gibson/utils/web_ui.py 5552</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">当您无法物理访问运行 gibson 的计算机或在无头云环境中运行时，这非常有用。</font><font style="vertical-align: inherit;">您需要更改</font></font><code>mode</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">配置文件才能</font></font><code>web_ui</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 Web 用户界面。</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/web_ui.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/web_ui.png" width="600" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">渲染语义</font></font></h2><a id="user-content-rendering-semantics" class="anchor" aria-label="永久链接：渲染语义" href="#rendering-semantics"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/instance_colorcoding_semantics.png"><img src="/StanfordVL/GibsonEnv/raw/master/misc/instance_colorcoding_semantics.png" width="600" style="max-width: 100%;"></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">当模型被语义注释时，Gibson 可以提供逐像素的逐帧语义掩码。</font><font style="vertical-align: inherit;">截至目前，我们已</font><font style="vertical-align: inherit;">为此目的整合了</font></font><a href="http://buildingparser.stanford.edu/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">斯坦福 2D-3D-语义数据集</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和</font></font><a href="https://niessner.github.io/Matterport/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Matterport 3D的模型。</font></font></a><font style="vertical-align: inherit;"></font><a href="https://github.com/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md#download-gibson-database-of-spaces"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您可以在</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson 中访问它们</font><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">我们建议您参考原始数据集的参考，以获取其语义类和注释的列表。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">有关 Gibson 中渲染语义的详细说明，请参阅</font></font><a href="/StanfordVL/GibsonEnv/blob/master/gibson/utils/semantics.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">语义说明</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">作为安装附带的入门数据集中的一个示例，</font></font><code>space7</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">包括斯坦福 2D-3D-Semantics 风格注释。</font></font></p>
+
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人代理</font></font></h2><a id="user-content-robotic-agents" class="anchor" aria-label="永久链接：机器人代理" href="#robotic-agents"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson 提供了一组基本代理。</font></font><a href="http://gibsonenv.stanford.edu/agents/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请在此处</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看这些代理的视频及其相应的感知观察</font><font style="vertical-align: inherit;">。
+</font></font><animated-image data-catalyst=""><a target="_blank" rel="noopener noreferrer" href="/StanfordVL/GibsonEnv/blob/master/misc/agents.gif" data-target="animated-image.originalLink"><img src="/StanfordVL/GibsonEnv/raw/master/misc/agents.gif" style="max-width: 100%; display: inline-block;" data-target="animated-image.originalImage"></a>
+      <span class="AnimatedImagePlayer" data-target="animated-image.player" hidden="">
+        <a data-target="animated-image.replacedLink" class="AnimatedImagePlayer-images" href="https://github.com/StanfordVL/GibsonEnv/blob/master/misc/agents.gif" target="_blank">
+          
+        <span data-target="animated-image.imageContainer">
+            <img data-target="animated-image.replacedImage" alt="agents.gif" class="AnimatedImagePlayer-animatedImage" src="https://github.com/StanfordVL/GibsonEnv/raw/master/misc/agents.gif" style="display: block; opacity: 1;">
+          <canvas class="AnimatedImagePlayer-stillImage" aria-hidden="true" width="814" height="116"></canvas></span></a>
+        <button data-target="animated-image.imageButton" class="AnimatedImagePlayer-images" tabindex="-1" aria-label="Play agents.gif" hidden=""></button>
+        <span class="AnimatedImagePlayer-controls" data-target="animated-image.controls" hidden="">
+          <button data-target="animated-image.playButton" class="AnimatedImagePlayer-button" aria-label="Play agents.gif">
+            <svg aria-hidden="true" focusable="false" class="octicon icon-play" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 13.5427V2.45734C4 1.82607 4.69692 1.4435 5.2295 1.78241L13.9394 7.32507C14.4334 7.63943 14.4334 8.36057 13.9394 8.67493L5.2295 14.2176C4.69692 14.5565 4 14.1739 4 13.5427Z">
+            </path></svg>
+            <svg aria-hidden="true" focusable="false" class="octicon icon-pause" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="2" width="3" height="12" rx="1"></rect>
+              <rect x="9" y="2" width="3" height="12" rx="1"></rect>
+            </svg>
+          </button>
+          <a data-target="animated-image.openButton" aria-label="Open agents.gif in new window" class="AnimatedImagePlayer-button" href="https://github.com/StanfordVL/GibsonEnv/blob/master/misc/agents.gif" target="_blank">
+            <svg aria-hidden="true" class="octicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+              <path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path>
+            </svg>
+          </a>
+        </span>
+      </span></animated-image></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">为了（可选）抽象出低级控制和机器人动力学来执行高级任务，我们还为每个代理提供了一组实用且理想的控制器。</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">代理名称</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">自由度</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">信息</font></font></th>
+<th align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">控制器</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">穆乔科蚂蚁</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">8</font></font></td>
+<td align="center"><a href="https://blog.openai.com/roboschool/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">开放人工智能链接</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">扭矩</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">穆乔科人形生物</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">17 号</font></font></td>
+<td align="center"><a href="https://blog.openai.com/roboschool/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">开放人工智能链接</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">扭矩</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">哈士奇机器人</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">4</font></font></td>
+<td align="center"><a href="http://wiki.ros.org/Robots/Husky" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">活性氧</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">,</font></font><a href="https://www.clearpathrobotics.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">制造商</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">扭矩、速度、位置</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">小牛机器人</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">8</font></font></td>
+<td align="center"><a href="https://www.ghostrobotics.io/copy-of-robots" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人页面</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，</font></font><a href="https://www.ghostrobotics.io/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">制造商</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">正弦控制器</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">兔子杰克</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">2</font></font></td>
+<td align="center"><a href="http://cvgl.stanford.edu/projects/jackrabbot/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">斯坦福项目链接</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">扭矩、速度、位置</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">海龟机器人</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">2</font></font></td>
+<td align="center"><a href="http://wiki.ros.org/Robots/TurtleBot" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">活性氧</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">,</font></font><a href="https://www.turtlebot.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">制造商</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">扭矩、速度、位置</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">四旋翼飞行器</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">6</font></font></td>
+<td align="center"><a href="https://repository.upenn.edu/cgi/viewcontent.cgi?referer=https://www.google.com/&amp;httpsredir=1&amp;article=1705&amp;context=edissertations" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">纸</font></font></a></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">位置</font></font></td>
+</tr>
+</tbody>
 </table>
-
-We also tested on <code>Intel I7 7700 + NVIDIA GeForce GTX 1070Ti</code> and <code>Tested on Intel I7 6580k + NVIDIA GTX 1080Ti</code> platforms. The FPS difference is within 10% on each task.
-
-<table class="table">
-    <tr>
-        <th scope="row">Platform</th>
-        <td colspan="6">Multi-process FPS tested on Intel E5-2697 v4 + NVIDIA Tesla V100</td>
-    </tr>
-    <tr>
-      <th scope="col">Configuration</th>
-      <th scope="col">512x512 episode sync</th>
-      <th scope="col">512x512 frame sync</th>
-      <th scope="col">256x256 episode sync</th>
-      <th scope="col">256x256 frame sync</th>
-      <th scope="col">128x128 episode sync</th>
-      <th scope="col">128x128 frame sync</th>
-    </tr>
-    <tr>
-      <th scope="row">1 process</th>
-      <td>12.8</td>
-      <td>12.02</td>
-      <td>32.98</td>
-      <td>32.98</td>
-      <td>52</td>
-      <td>52</td>
-    </tr>
-    <tr>
-      <th scope="row">2 processes</th>
-      <td>23.4</td>
-      <td>20.9</td>
-      <td>60.89</td>
-      <td>53.63</td>
-      <td>86.1</td>
-      <td>101.8</td>
-    </tr>
-    <tr>
-      <th scope="row">4 processes</th>
-      <td>42.4</td>
-      <td>31.97</td>
-      <td>105.26</td>
-      <td>76.23</td>
-      <td>97.6</td>
-      <td>145.9</td>
-    </tr>
-    <tr>
-      <th scope="row">8 processes</th>
-      <td>72.5</td>
-      <td>48.1</td>
-      <td>138.5</td>
-      <td>97.72</td>
-      <td>113</td>
-      <td>151</td>
-    </tr>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">起始代码</font></font></h3><a id="user-content-starter-code" class="anchor" aria-label="永久链接：起始代码" href="#starter-code"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"></font><code>examples/demo</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多演示示例可以在文件夹</font><font style="vertical-align: inherit;">中找到</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">例子</font></font></th>
+<th align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">解释</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>play_ant_camera.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 1234567890qwerty 键控制蚂蚁在盖茨大楼周围导航，同时还会显示 RGB 和深度相机输出。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_ant_nonviz.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 1234567890qwerty 键来控制蚂蚁在盖茨大楼周围导航。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_drone_camera.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 ASWDZX 键控制无人机在盖茨大楼周围导航，同时还会显示 RGB 和深度相机输出。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_drone_nonviz.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 ASWDZX 键控制无人机在盖茨大楼周围导航</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_humanoid_camera.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 1234567890qwertui 键来控制人形机器人在盖茨大楼周围导航。</font><font style="vertical-align: inherit;">开个玩笑，用键盘控制人形太难了，只能眼睁睁看着它掉下来。</font><font style="vertical-align: inherit;">按 R 重置。</font><font style="vertical-align: inherit;">还显示了 RGB 和深度相机输出。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_humanoid_nonviz.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">观看人形物体坠落。</font><font style="vertical-align: inherit;">按 R 重置。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_husky_camera.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 ASWD 键控制汽车在盖茨大楼周围导航，同时还会显示 RGB 和深度摄像头输出。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>play_husky_nonviz.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用键盘上的 ASWD 键控制汽车在盖茨大楼周围导航</font></font></td>
+</tr>
+</tbody>
 </table>
-
-<img src=misc/mpi_fps.png width="600">
-
-Web User Interface
-----
-When running Gibson, you can start a web user interface with `python gibson/utils/web_ui.py python gibson/utils/web_ui.py 5552`. This is helpful when you cannot physically access the machine running gibson or you are running on a headless cloud environment. You need to change `mode` in configuration file to `web_ui` to use the web user interface.
-
-<img src=misc/web_ui.png width="600">
-
-Rendering Semantics
-----
-<img src=misc/instance_colorcoding_semantics.png width="600">
-
-Gibson can provide pixel-wise frame-by-frame semantic masks when the model is semantically annotated. As of now we have incorporated models from [Stanford 2D-3D-Semantics Dataset](http://buildingparser.stanford.edu/) and [Matterport 3D](https://niessner.github.io/Matterport/) for this purpose. You can access them within Gibson [here](https://github.com/StanfordVL/GibsonEnv/blob/master/gibson/data/README.md#download-gibson-database-of-spaces). We refer you to the original dataset's reference for the list of their semantic classes and annotations. 
-
-For detailed instructions of rendering semantics in Gibson, see [semantic instructions](gibson/utils/semantics.md). As one example in the starter dataset that comes with installation, `space7` includes Stanford 2D-3D-Semantics style annotation. 
-
-<!---
-**Agreement**: If you choose to use the models from [Stanford 2D3DS](http://3dsemantics.stanford.edu/) or [Matterport 3D](https://niessner.github.io/Matterport/) for rendering semantics, please sign their respective license agreements. Stanford 2D3DS's agreement is inclued in Gibson Database's agreement and does not need to be signed again. For Matterport3D, please see [here](https://niessner.github.io/Matterport/).
---->
-
-Robotic Agents
-----
-
-Gibson provides a base set of agents. See videos of these agents and their corresponding perceptual observation [here](http://gibsonenv.stanford.edu/agents/). 
-<img src=misc/agents.gif>
-
-To enable (optionally) abstracting away low-level control and robot dynamics for high-level tasks, we also provide a set of practical and ideal controllers for each agent.
-
-| Agent Name     | DOF | Information      | Controller |
-|:-------------: | :-------------: |:-------------: |:-------------| 
-| Mujoco Ant      | 8   | [OpenAI Link](https://blog.openai.com/roboschool/) | Torque |
-| Mujoco Humanoid | 17  | [OpenAI Link](https://blog.openai.com/roboschool/) | Torque |
-| Husky Robot     | 4   | [ROS](http://wiki.ros.org/Robots/Husky), [Manufacturer](https://www.clearpathrobotics.com/) | Torque, Velocity, Position |
-| Minitaur Robot  | 8   | [Robot Page](https://www.ghostrobotics.io/copy-of-robots), [Manufacturer](https://www.ghostrobotics.io/) | Sine Controller |
-| JackRabbot      | 2   | [Stanford Project Link](http://cvgl.stanford.edu/projects/jackrabbot/) | Torque, Velocity, Position |
-| TurtleBot       | 2   | [ROS](http://wiki.ros.org/Robots/TurtleBot), [Manufacturer](https://www.turtlebot.com/) | Torque, Velocity, Position |
-| Quadrotor         | 6   | [Paper](https://repository.upenn.edu/cgi/viewcontent.cgi?referer=https://www.google.com/&httpsredir=1&article=1705&context=edissertations) | Position |
-
-
-### Starter Code 
-
-More demonstration examples can be found in `examples/demo` folder
-
-| Example        | Explanation          |
-|:-------------: |:-------------| 
-|`play_ant_camera.py`|Use 1234567890qwerty keys on your keyboard to control an ant to navigate around Gates building, while RGB and depth camera outputs are also shown. |
-|`play_ant_nonviz.py`| Use 1234567890qwerty keys on your keyboard to control an ant to navigate around Gates building.|
-|`play_drone_camera.py`| Use ASWDZX keys on your keyboard to control a drone to navigate around Gates building, while RGB and depth camera outputs are also shown.|
-|`play_drone_nonviz.py`| Use ASWDZX keys on your keyboard to control a drone to navigate around Gates building|
-|`play_humanoid_camera.py`| Use 1234567890qwertyui keys on your keyboard to control a humanoid to navigate around Gates building. Just kidding, controlling humaniod with keyboard is too difficult, you can only watch it fall. Press R to reset. RGB and depth camera outputs are also shown. |
-|`play_humanoid_nonviz.py`| Watch a humanoid fall. Press R to reset.|
-|`play_husky_camera.py`| Use ASWD keys on your keyboard to control a car to navigate around Gates building, while RGB and depth camera outputs are also shown.|
-|`play_husky_nonviz.py`| Use ASWD keys on your keyboard to control a car to navigate around Gates building|
-
-More training code can be found in `examples/train` folder.
-
-| Example        | Explanation          |
-|:-------------: |:-------------| 
-|`train_husky_navigate_ppo2.py`|   Use PPO2 to train a car to navigate down the hallway in Gates building, using RGBD input from the camera.|
-|`train_husky_navigate_ppo1.py`|   Use PPO1 to train a car to navigate down the hallway in Gates building, using RGBD input from the camera.|
-|`train_ant_navigate_ppo1.py`| Use PPO1 to train an ant to navigate down the hallway in Gates building, using visual input from the camera. |
-|`train_ant_climb_ppo1.py`| Use PPO1 to train an ant to climb down the stairs in Gates building, using visual input from the camera.  |
-|`train_ant_gibson_flagrun_ppo1.py`| Use PPO1 to train an ant to chase a target (a red cube) in Gates building. Everytime the ant gets to target(or time out), the target will change position.|
-|`train_husky_gibson_flagrun_ppo1.py`|Use PPO1 to train a car to chase a target (a red cube) in Gates building. Everytime the car gets to target(or time out), the target will change position. |
-
-ROS Configuration
----------
-
-We provide examples of configuring Gibson with ROS [here](examples/ros/gibson-ros). We use turtlebot as an example, after a policy is trained in Gibson, it requires minimal changes to deploy onto a turtlebot. See [README](examples/ros/gibson-ros) for more details.
-
-
-
-
-Coding Your RL Agent
-====
-You can code your RL agent following our convention. The interface with our environment is very simple (see some examples in the end of this section).
-
-First, you can create an environment by creating an instance of classes in `gibson/core/envs` folder. 
-
-
-```python
-env = AntNavigateEnv(is_discrete=False, config = config_file)
-```
-
-Then do one step of the simulation with `env.step`. And reset with `env.reset()`
-```python
-obs, rew, env_done, info = env.step(action)
-```
-`obs` gives the observation of the robot. It is a dictionary with each component as a key value pair. Its keys are specified by user inside config file. E.g. `obs['nonviz_sensor']` is proprioceptive sensor data, `obs['rgb_filled']` is rgb camera data.
-
-`rew` is the defined reward. `env_done` marks the end of one episode, for example, when the robot dies. 
-`info` gives some additional information of this step; sometimes we use this to pass additional non-visual sensor values.
-
-We mostly followed [OpenAI gym](https://github.com/openai/gym) convention when designing the interface of RL algorithms and the environment. In order to help users start with the environment quicker, we
-provide some examples at [examples/train](examples/train). The RL algorithms that we use are from [openAI baselines](https://github.com/openai/baselines) with some adaptation to work with hybrid visual and non-visual sensory data.
-In particular, we used [PPO](https://github.com/openai/baselines/tree/master/baselines/ppo1) and a speed optimized version of [PPO](https://github.com/openai/baselines/tree/master/baselines/ppo2).
-
-
-Environment Configuration
-=================
-Each environment is configured with a `yaml` file. Examples of `yaml` files can be found in `examples/configs` folder. Parameters for the file is explained below. For more informat specific to Bullet Physics engine, you can see the documentation [here](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit).
-
-| Argument name        | Example value           | Explanation  |
-|:-------------:|:-------------:| :-----|
-| envname      | AntClimbEnv | Environment name, make sure it is the same as the class name of the environment |
-| model_id      | space1-space8      |   Scene id, in beta release, choose from space1-space8 |
-| target_orn | [0, 0, 3.14]      |   Eulerian angle (in radian) target orientation for navigating, the reference frame is world frame. For non-navigation tasks, this parameter is ignored. |
-|target_pos | [-7, 2.6, -1.5] | target position (in meter) for navigating, the reference frame is world frame. For non-navigation tasks, this parameter is ignored. |
-|initial_orn | [0, 0, 3.14] | initial orientation (in radian) for navigating, the reference frame is world frame |
-|initial_pos | [-7, 2.6, 0.5] | initial position (in meter) for navigating, the reference frame is world frame|
-|fov | 1.57  | field of view for the camera, in radian |
-| use_filler | true/false  | use neural network filler or not. It is recommended to leave this argument true. See [Gibson Environment website](http://gibson.vision/) for more information. |
-|display_ui | true/false  | Gibson has two ways of showing visual output, either in multiple windows, or aggregate them into a single pygame window. This argument determines whether to show pygame ui or not, if in a production environment (training), you need to turn this off |
-|show_diagnostics | true/false  | show dignostics(including fps, robot position and orientation, accumulated rewards) overlaying on the RGB image |
-|ui_num |2  | how many ui components to show, this should be length of ui_components. |
-| ui_components | [RGB_FILLED, DEPTH]  | which are the ui components, choose from [RGB_FILLED, DEPTH, NORMAL, SEMANTICS, RGB_PREFILLED] |
-|output | [nonviz_sensor, rgb_filled, depth]  | output of the environment to the robot, choose from  [nonviz_sensor, rgb_filled, depth]. These values are independent of `ui_components`, as `ui_components` determines what to show and `output` determines what the robot receives. |
-|resolution | 512 | choose from [128, 256, 512] resolution of rgb/depth image |
-|initial_orn | [0, 0, 3.14] | initial orientation (in radian) for navigating, the reference frame is world frame |
-|speed : timestep | 0.01 | length of one physics simulation step in seconds(as defined in [Bullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). For example, if timestep=0.01 sec, frameskip=10, and the environment is running at 100fps, it will be 10x real time. Note: setting timestep above 0.1 can cause instability in current version of Bullet simulator since an object should not travel faster than its own radius within one timestep. You can keep timestep at a low value but increase frameskip to simulate at a faster speed. See [Bullet guide](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit) under "discrete collision detection" for more info.|
-|speed : frameskip | 10 | how many timestep to skip when rendering frames. See above row for an example. For tasks that does not require high frequency control, you can set frameskip to larger value to gain further speed up. |
-|mode | gui/headless/web_ui  | gui or headless, if in a production environment (training), you need to turn this to headless. In gui mode, there will be visual output; in headless mode, there will be no visual output. In addition to that, if you set mode to web_ui, it will behave like in headless mode but the visual will be rendered to a web UI server. ([more information](#web-user-interface))|
-|verbose |true/false  | show diagnostics in terminal |
-|fast_lq_render| true/false| if there is fast_lq_render in yaml file, Gibson will use a smaller filler network, this will render faster but generate slightly lower quality camera output. This option is useful for training RL agents fast. |
-
-#### Making Your Customized Environment
-Gibson provides a set of methods for you to define your own environments. You can follow the existing environments inside `gibson/core/envs`.
-
-| Method name        | Usage           |
-|:------------------:|:---------------------------|
-| robot.render_observation(pose) | Render new observations based on pose, returns a dictionary. |
-| robot.get_observation() | Get observation at current pose. Needs to be called after robot.render_observation(pose). This does not induce extra computation. |
-| robot.get_position() | Get current robot position. |
-| robot.get_orientation() | Get current robot orientation. |
-| robot.eyes.get_position() | Get current robot perceptive camera position. |
-| robot.eyes.get_orientation() | Get current robot perceptive camera orientation. | 
-| robot.get_target_position() | Get robot target position. |
-| robot.apply_action(action) | Apply action to robot. |  
-| robot.reset_new_pose(pos, orn) | Reset the robot to any pose. |
-| robot.dist_to_target() | Get current distance from robot to target. |
-
-Goggles: transferring the agent to real-world
-=================
-Gibson includes a baked-in domain adaptation mechanism, named Goggles, for when an agent trained in Gibson is going to be deployed in real-world (i.e. operate based on images coming from an onboard camera). The mechanisms is essentially a learned inverse function that alters the frames coming from a real camera to what they would look like if they were rendered via Gibson, and hence, disolve the domain gap. 
-
-<img src=http://gibson.vision/public/img/figure4.jpg width="600">
-
-
-**More details:** With all the imperfections in point cloud rendering, it has been proven difficult to get completely photo-realistic rendering with neural network fixes. The remaining issues make a domain gap between the synthesized and real images. Therefore, we formulate the rendering problem as forming a joint space ensuring a correspondence between rendered and real images, rather than trying to (unsuccessfully) render images that are identical to real ones. This provides a deterministic pathway for traversing across these domains and hence undoing the gap. We add another network "u" for target image (I_t) and define the rendering loss to minimize the distance between f(I_s) and u(I_t), where "f" and "I_s" represent the filler neural network and point cloud rendering output, respectively (see the loss in above figure). We use the same network structure for f and u. The function u(I) is trained to alter the observation in real-world, I_t, to look like the corresponding I_s and consequently dissolve the gap. We named the u network goggles, as it resembles corrective lenses for the agent for deployment in real-world. Detailed formulation and discussion of the mechanism can be found in the paper. You can download the function u and apply it when you deploy your trained agent in real-world.
-
-In order to use goggle, you will need preferably a camera with depth sensor, we provide an example [here](examples/ros/gibson-ros/goggle.py) for Kinect. The trained goggle functions are stored in `assets/unfiller_{resolution}.pth`, and each one is paired with one filler function. You need to use the correct one depending on which filler function is used. If you don't have a camera with depth sensor, we also provide an example for RGB only [here](examples/demo/goggle_video.py).
-
-
-Citation
-=================
-
-If you use Gibson Environment's software or database, please cite:
-```
-@inproceedings{xiazamirhe2018gibsonenv,
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多训练代码可以在文件夹中找到</font></font><code>examples/train</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">例子</font></font></th>
+<th align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">解释</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>train_husky_navigate_ppo2.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 PPO2 使用摄像头的 RGBD 输入来训练汽车沿着盖茨大楼的走廊行驶。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>train_husky_navigate_ppo1.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">&nbsp; 使用 PPO1 使用摄像头的 RGBD 输入来训练汽车沿着盖茨大楼的走廊行驶。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>train_ant_navigate_ppo1.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 PPO1 训练蚂蚁通过摄像头的视觉输入沿着盖茨大楼的走廊导航。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>train_ant_climb_ppo1.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 PPO1 通过摄像头的视觉输入来训练蚂蚁爬下盖茨大楼的楼梯。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>train_ant_gibson_flagrun_ppo1.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 PPO1 训练蚂蚁追逐盖茨大楼中的目标（红色立方体）。</font><font style="vertical-align: inherit;">每当蚂蚁到达目标（或超时）时，目标就会改变位置。</font></font></td>
+</tr>
+<tr>
+<td align="center"><code>train_husky_gibson_flagrun_ppo1.py</code></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用 PPO1 训练汽车追逐盖茨大楼中的目标（红色立方体）。</font><font style="vertical-align: inherit;">每次汽车到达目标（或超时）时，目标都会改变位置。</font></font></td>
+</tr>
+</tbody>
+</table>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS配置</font></font></h2><a id="user-content-ros-configuration" class="anchor" aria-label="永久链接：ROS 配置" href="#ros-configuration"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="/StanfordVL/GibsonEnv/blob/master/examples/ros/gibson-ros"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">我们在这里</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">提供了使用 ROS 配置 Gibson 的示例</font><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">我们以turtlebot为例，在Gibson中训练策略后，只需进行最少的更改即可部署到turtlebot上。</font><font style="vertical-align: inherit;">有关更多详细信息，</font><font style="vertical-align: inherit;">请参阅</font></font><a href="/StanfordVL/GibsonEnv/blob/master/examples/ros/gibson-ros"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">自述文件。</font></font></a><font style="vertical-align: inherit;"></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">编写 RL 代理的代码</font></font></h1><a id="user-content-coding-your-rl-agent" class="anchor" aria-label="永久链接：编写 RL 代理代码" href="#coding-your-rl-agent"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您可以按照我们的约定对您的 RL 代理进行编码。</font><font style="vertical-align: inherit;">我们的环境的接口非常简单（请参阅本节末尾的一些示例）。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">首先，您可以通过在文件夹中创建类的实例来创建环境</font></font><code>gibson/core/envs</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-s1">env</span> <span class="pl-c1">=</span> <span class="pl-v">AntNavigateEnv</span>(<span class="pl-s1">is_discrete</span><span class="pl-c1">=</span><span class="pl-c1">False</span>, <span class="pl-s1">config</span> <span class="pl-c1">=</span> <span class="pl-s1">config_file</span>)</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="env = AntNavigateEnv(is_discrete=False, config = config_file)" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">然后用 进行一步模拟</font></font><code>env.step</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">并重置</font></font><code>env.reset()</code></p>
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto"><pre><span class="pl-s1">obs</span>, <span class="pl-s1">rew</span>, <span class="pl-s1">env_done</span>, <span class="pl-s1">info</span> <span class="pl-c1">=</span> <span class="pl-s1">env</span>.<span class="pl-en">step</span>(<span class="pl-s1">action</span>)</pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="obs, rew, env_done, info = env.step(action)" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><code>obs</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">给出机器人的观察结果。</font><font style="vertical-align: inherit;">它是一个字典，每个组件作为键值对。</font><font style="vertical-align: inherit;">它的键由用户在配置文件中指定。</font><font style="vertical-align: inherit;">例如</font></font><code>obs['nonviz_sensor']</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是本体感受传感器数据，</font></font><code>obs['rgb_filled']</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是RGB相机数据。</font></font></p>
+<p dir="auto"><code>rew</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是定义的奖励。</font></font><code>env_done</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">标志着一集的结束，例如机器人死亡时。
+</font></font><code>info</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">给出此步骤的一些附加信息；</font><font style="vertical-align: inherit;">有时我们用它来传递额外的非视觉传感器值。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在设计 RL 算法和环境的接口时，</font><font style="vertical-align: inherit;">我们主要遵循</font></font><a href="https://github.com/openai/gym"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">OpenAIgym惯例。</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">为了帮助用户更快地开始使用该环境，我们在</font></font><a href="/StanfordVL/GibsonEnv/blob/master/examples/train"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Examples/train</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中提供了一些示例。</font><font style="vertical-align: inherit;">我们使用的强化学习算法来自</font></font><a href="https://github.com/openai/baselines"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">openAI 基线</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，并进行了一些调整，以处理混合视觉和非视觉感官数据。</font><font style="vertical-align: inherit;">特别是，我们使用了</font></font><a href="https://github.com/openai/baselines/tree/master/baselines/ppo1"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PPO和</font></font></a><font style="vertical-align: inherit;"></font><a href="https://github.com/openai/baselines/tree/master/baselines/ppo2"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PPO</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">的速度优化版本</font><font style="vertical-align: inherit;">。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">环境配置</font></font></h1><a id="user-content-environment-configuration" class="anchor" aria-label="永久链接：环境配置" href="#environment-configuration"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">每个环境都配置有一个</font></font><code>yaml</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">文件。</font><font style="vertical-align: inherit;">文件示例</font></font><code>yaml</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可以在文件夹中找到</font></font><code>examples/configs</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font><font style="vertical-align: inherit;">该文件的参数解释如下。</font><font style="vertical-align: inherit;">有关 Bullet 物理引擎的更多信息，您可以</font></font><a href="https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在此处</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">查看文档。</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">参数名称</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">示例值</font></font></th>
+<th align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">解释</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">环境名称</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">AntClimb环境</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">环境名称，确保与环境的类名相同</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">型号_id</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">空间1-空间8</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">场景id，在测试版中，从space1-space8中选择</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">目标_orn</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[0, 0, 3.14]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">欧拉角（弧度）导航目标方向，参考系为世界系。</font><font style="vertical-align: inherit;">对于非导航任务，该参数被忽略。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">目标位置</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[-7, 2.6, -1.5]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导航的目标位置（以米为单位），参考系为世界系。</font><font style="vertical-align: inherit;">对于非导航任务，该参数被忽略。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">初始_orn</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[0, 0, 3.14]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导航的初始方向（以弧度为单位），参考系为世界系</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">初始位置</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[-7, 2.6, 0.5]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导航的初始位置（以米为单位），参考系为世界系</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">视场</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">1.57</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">相机的视野，以弧度为单位</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用填充剂</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">真假</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">是否使用神经网络填充器。</font><font style="vertical-align: inherit;">建议将此参数保留为真。</font><font style="vertical-align: inherit;">请参阅</font></font><a href="http://gibson.vision/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">吉布森环境网站</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">了解更多信息。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">显示用户界面</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">真假</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson 有两种显示视觉输出的方式，要么在多个窗口中，要么将它们聚合到一个 pygame 窗口中。</font><font style="vertical-align: inherit;">该参数决定是否显示pygame ui，如果在生产环境（训练），则需要将其关闭</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">显示诊断</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">真假</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">显示叠加在 RGB 图像上的诊断信息（包括 fps、机器人位置和方向、累积奖励）</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用户界面编号</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">2</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要显示多少个 ui 组件，这应该是 ui_components 的长度。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用户界面组件</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[RGB_FILLED，深度]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">这是 ui 组件，从 [RGB_FILLED、DEPTH、NORMAL、SEMANTICS、RGB_PREFILLED] 中选择</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">输出</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[nonviz_sensor、rgb_filled、深度]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">将环境输出到机器人，从 [nonviz_sensor、rgb_filled、深度] 中选择。</font><font style="vertical-align: inherit;">这些值与 无关</font></font><code>ui_components</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，因为</font></font><code>ui_components</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">它决定了显示内容并</font></font><code>output</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">决定了机器人接收的内容。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">解决</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">第512章</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从 [128, 256, 512] 分辨率中选择 RGB/深度图像</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">初始_orn</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">[0, 0, 3.14]</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">导航的初始方向（以弧度为单位），参考系为世界系</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">速度：时间步长</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">0.01</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">一个物理模拟步骤的长度（以秒为单位）（如</font></font><a href="https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Bullet</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">中所定义）。</font><font style="vertical-align: inherit;">例如，如果 timestep=0.01 秒，frameskip=10，并且环境以 100fps 运行，则它将是 10 倍实时。</font><font style="vertical-align: inherit;">注意：将时间步设置为高于 0.1 可能会导致当前版本的 Bullet 模拟器不稳定，因为对象在一个时间步内的移动速度不应超过其自身半径。</font><font style="vertical-align: inherit;">您可以将时间步长保持在较低值，但增加跳帧以更快的速度进行模拟。</font><font style="vertical-align: inherit;">有关详细信息，请参阅</font><font style="vertical-align: inherit;">“离散碰撞检测”下的</font></font><a href="https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">项目符号指南。</font></font></a><font style="vertical-align: inherit;"></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">速度：跳帧</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">10</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">渲染帧时要跳过多少时间步。</font><font style="vertical-align: inherit;">请参阅上行的示例。</font><font style="vertical-align: inherit;">对于不需要高频控制的任务，可以将frameskip设置为更大的值以获得进一步的加速。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">模式</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">图形用户界面/无头/web_ui</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">gui 或 headless，如果在生产环境（训练），则需要将其转为 headless。</font><font style="vertical-align: inherit;">gui模式下，会有视觉输出；</font><font style="vertical-align: inherit;">在无头模式下，不会有任何视觉输出。</font><font style="vertical-align: inherit;">除此之外，如果将模式设置为 web_ui，它将像无头模式一样运行，但视觉效果将呈现到 Web UI 服务器。</font><font style="vertical-align: inherit;">（</font></font><a href="#web-user-interface"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多信息</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">）</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">冗长的</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">真假</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在终端中显示诊断信息</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">fast_lq_render</font></font></td>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">真假</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果 yaml 文件中有 fast_lq_render，Gibson 将使用较小的填充网络，这将渲染速度更快，但生成质量稍低的相机输出。</font><font style="vertical-align: inherit;">此选项对于快速训练 RL 代理非常有用。</font></font></td>
+</tr>
+</tbody>
+</table>
+<div class="markdown-heading" dir="auto"><h4 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">打造您的定制环境</font></font></h4><a id="user-content-making-your-customized-environment" class="anchor" aria-label="永久链接：打造您的定制环境" href="#making-your-customized-environment"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson 提供了一组方法供您定义自己的环境。</font><font style="vertical-align: inherit;">您可以按照里面现有的环境进行操作</font></font><code>gibson/core/envs</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">方法名称</font></font></th>
+<th align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">用法</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.render_observation（姿势）</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">根据姿势渲染新的观察结果，返回字典。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.get_observation()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">以当前姿势进行观察。</font><font style="vertical-align: inherit;">需要在robot.render_observation(pose)之后调用。</font><font style="vertical-align: inherit;">这不会引起额外的计算。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.get_position()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取当前机器人位置。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.get_orientation()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取当前机器人方向。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.眼睛.get_position()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取当前机器人感知相机位置。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.眼睛.get_orientation()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取当前机器人感知相机方向。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.get_target_position()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取机器人目标位置。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.apply_action(动作)</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">对机器人应用动作。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.reset_new_pose(pos, orn)</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">将机器人重置为任意姿势。</font></font></td>
+</tr>
+<tr>
+<td align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">机器人.dist_to_target()</font></font></td>
+<td align="left"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获取机器人到目标的当前距离。</font></font></td>
+</tr>
+</tbody>
+</table>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">护目镜：将代理转移到现实世界</font></font></h1><a id="user-content-goggles-transferring-the-agent-to-real-world" class="anchor" aria-label="永久链接：Goggles：将代理转移到现实世界" href="#goggles-transferring-the-agent-to-real-world"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Gibson 包含一个名为 Goggles 的内置域适应机制，用于在 Gibson 中训练的代理将被部署到现实世界中时（即根据来自机载摄像头的图像进行操作）。</font><font style="vertical-align: inherit;">该机制本质上是一种学习的逆函数，它将来自真实相机的帧更改为通过吉布森渲染的帧，从而消除域间隙。</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6197ef9a1041f279b841b3164271cc4294044e845c5c6ee8acee1d95519ccb43/687474703a2f2f676962736f6e2e766973696f6e2f7075626c69632f696d672f666967757265342e6a7067"><img src="https://camo.githubusercontent.com/6197ef9a1041f279b841b3164271cc4294044e845c5c6ee8acee1d95519ccb43/687474703a2f2f676962736f6e2e766973696f6e2f7075626c69632f696d672f666967757265342e6a7067" width="600" data-canonical-src="http://gibson.vision/public/img/figure4.jpg" style="max-width: 100%;"></a></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">更多细节：</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">由于点云渲染存在所有缺陷，事实证明很难通过神经网络修复来获得完全逼真的渲染。</font><font style="vertical-align: inherit;">剩下的问题使得合成图像和真实图像之间存在域差距。</font><font style="vertical-align: inherit;">因此，我们将渲染问题表述为形成一个联合空间，确保渲染图像和真实图像之间的对应关系，而不是尝试（不成功地）渲染与真实图像相同的图像。</font><font style="vertical-align: inherit;">这为穿越这些域提供了一条确定性的路径，从而消除了差距。</font><font style="vertical-align: inherit;">我们为目标图像（I_t）添加另一个网络“u”，并定义渲染损失以最小化f（I_s）和u（I_t）之间的距离，其中“f”和“I_s”代表填充神经网络和点云渲染分别输出（参见上图的损失）。</font><font style="vertical-align: inherit;">我们对 f 和 u 使用相同的网络结构。</font><font style="vertical-align: inherit;">函数 u(I) 经过训练，可以改变现实世界中的观察值 I_t，使其看起来像相应的 I_s，从而消除间隙。</font><font style="vertical-align: inherit;">我们将 u 网络护目镜命名为 u 网络护目镜，因为它类似于现实世界中部署的代理的矫正镜片。</font><font style="vertical-align: inherit;">该机制的详细阐述和讨论可以在论文中找到。</font><font style="vertical-align: inherit;">您可以下载函数 u 并在现实世界中部署训练有素的代理时应用它。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">为了使用护目镜，您最好需要一个带有深度传感器的相机，我们</font></font><a href="/StanfordVL/GibsonEnv/blob/master/examples/ros/gibson-ros/goggle.py"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在这里</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">提供了Kinect 的示例。</font><font style="vertical-align: inherit;">训练好的护目镜函数存储在 中</font></font><code>assets/unfiller_{resolution}.pth</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">，并且每一个函数都与一个填充函数配对。</font><font style="vertical-align: inherit;">您需要根据使用的填充函数来使用正确的填充函数。</font><font style="vertical-align: inherit;">如果您没有带深度传感器的相机，我们</font></font><a href="/StanfordVL/GibsonEnv/blob/master/examples/demo/goggle_video.py"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">在这里</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">也仅提供 RGB 的示例。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">引文</font></font></h1><a id="user-content-citation" class="anchor" aria-label="永久链接：引文" href="#citation"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您使用 Gibson Environment 的软件或数据库，请引用：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>@inproceedings{xiazamirhe2018gibsonenv,
   title={Gibson {Env}: real-world perception for embodied agents},
   author={Xia, Fei and R. Zamir, Amir and He, Zhi-Yang and Sax, Alexander and Malik, Jitendra and Savarese, Silvio},
   booktitle={Computer Vision and Pattern Recognition (CVPR), 2018 IEEE Conference on},
   year={2018},
   organization={IEEE}
 }
-```
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="@inproceedings{xiazamirhe2018gibsonenv,
+  title={Gibson {Env}: real-world perception for embodied agents},
+  author={Xia, Fei and R. Zamir, Amir and He, Zhi-Yang and Sax, Alexander and Malik, Jitendra and Savarese, Silvio},
+  booktitle={Computer Vision and Pattern Recognition (CVPR), 2018 IEEE Conference on},
+  year={2018},
+  organization={IEEE}
+}" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+</article></div>
